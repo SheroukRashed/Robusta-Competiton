@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Admin;
+use App\Http\Controllers\EmployeeController;
 use \Validator;
 
 class AdminController extends Controller
@@ -25,9 +26,45 @@ class AdminController extends Controller
      */
     public function profile()
     {
-        return response()->json(auth('admin_api')->admin());
+        return response()->json(auth('admin_api')->user());
     }
+    /**
+     * Get Employee Salary and Bouns.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getSalaries(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'month' => 'required|in:Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec',
+            'year' => 'required|digits:4|integer|min:2000|max:'.(date('Y')+10),
+        ]);
 
+        if ($validator->fails()) {
+            return response()->json($validator->errors()->toJson(), 400);
+        }
+
+        $employee = new EmployeeController();
+
+        $salariesPaymentDay = $employee->getPaymentDay($request->year, $request->month, 1);
+        $salariesTotal = $employee->getPaymentAmount();
+
+        $bounsPaymentDay = $employee->getPaymentDay($request->year, $request->month, 15);
+        $bounsTotal = $employee->getPaymentAmount(0.1);
+        
+        $paymentsTotal = $salariesTotal + $bounsTotal;
+
+        return response()->json([
+            'Month' => $request->month,
+            'Salaries_payment_day' => $salariesPaymentDay,
+            'Bonus_payment_day' => $bounsPaymentDay,
+            'Salaries_total' => '$'.$salariesTotal,
+            'Bonus_total' => '$'.$bounsTotal,
+            'Payments_total' => '$'.$paymentsTotal
+        ]);
+
+
+    }
     /**
      * Log the admin out (Invalidate the token).
      *

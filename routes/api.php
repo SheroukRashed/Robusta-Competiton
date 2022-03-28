@@ -21,10 +21,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::prefix('admin')->controller(AdminController::class)->group(function () {
 
-    Route::post('login', 'login');
-    Route::post('register', 'register');
+    Route::post('login', 'login')->name('login');
+    Route::post('register', 'register')->name('register');
     Route::middleware('auth:admin_api')->group(function () {
-        Route::post('logout', 'logout');
-        Route::post('profile', 'profile');
+        Route::post('logout', 'logout')->name('logout');
+        Route::post('profile', 'profile')->name('profile');
+        Route::post('salaries', 'getSalaries');
     });
 });
