@@ -100,6 +100,6 @@ The project is a laravel project implemented with a docker image containing ngni
 ## Ports 
 - Mysql : 3306.
 - Nginx : 81.
-- Laravel : 8080.
+- Laravel : 8000.
 
 
